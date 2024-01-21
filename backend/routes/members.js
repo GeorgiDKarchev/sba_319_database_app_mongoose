@@ -3,7 +3,7 @@ import Member from '../models/members.js';
 
 
 const router = new Router();
-
+//------------------------------------------------------------------
 /**
  * GET - return all members
  */
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     const members = await Member.find({});
     res.status(200).json(members);
 });
-
+//-------------------------------------------------------------------
 /**
  * GET /:id 
  * return member by id
@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
 //     else res.send(member).status(200);
 //   });
 
-
+//---------------------------------------------------------------------
 
 /**
  * POST - create a new member
@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(member);
 });
 
-
+//----------------------------------------------------------------------
 
 /**
  * PUT /:id
@@ -55,13 +55,9 @@ router.put('/:id', async (req, res) => {
         console.log(error);
         res.json({ msg: 'Member not found' });
     }
-
-
 });
 
-
-
-
+//----------------------------------------------------------------------
 /**
  * DELETE /:id
  */
