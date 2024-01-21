@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const member = await Member.findById(req.params.id);
 
-    if (!member) return res.status(404).json({ msg: "Member id not found" });
+    if (!member) return res.status(404).json({msg: "Member id not found" });
     else res.json(member);
 });
 // router.get("/:id", async(req, res)=>{
@@ -60,11 +60,16 @@ router.put('/:id', async (req, res) => {
 //----------------------------------------------------------------------
 /**
  * DELETE /:id
+ * Delete data from DB found by :/id
  */
-
-
-
-
-
+router.delete('/:id', async (req, res)=>{
+    const {id} = req.params;
+    try {
+        const deletedMember = await Member.findByIdAndDelete(id);
+        res.json({msg:"Member is deleted", deletedMember});
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 export default router;
