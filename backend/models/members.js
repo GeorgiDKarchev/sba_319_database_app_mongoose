@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 8;
 
 const membersSchema = new mongoose.Schema({
 
@@ -49,13 +52,19 @@ const membersSchema = new mongoose.Schema({
     ]
 
 });
-
+//------------------------------------------------------------------------------
 // index - ogranise data by ascending order
 membersSchema.index({age: 1});
 membersSchema.index({member_name: 1});
 
 
-
-
+//------------------------Bcrypt- password hash----------------------------------
+      
+membersSchema.pre('save', async function (next) {   //pre saved hook
+    //if the password has not change continue  =>
+    if (!this.isModified("password")) return next ();
+    this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+    return next ();
+});
 
 export default mongoose.model('Member', membersSchema);
