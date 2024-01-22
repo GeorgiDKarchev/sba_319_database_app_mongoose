@@ -50,8 +50,18 @@ const membersSchema = new mongoose.Schema({
             }
         }
     ]
-
+ 
+}, { //add timestamp with date when data is being created or modified
+    timestamps:true,
+    toJSON: {
+        transform: function(doc, retDoc) {
+    //removes password from the json doc (password not visible in frontend)
+            delete retDoc.password; 
+            return retDoc;
+        }
+    }
 });
+
 //------------------------------------------------------------------------------
 // index - ogranise data by ascending order
 membersSchema.index({age: 1});
