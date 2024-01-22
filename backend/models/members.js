@@ -6,11 +6,12 @@ const membersSchema = new mongoose.Schema({
         type: String,
         minLength: 2,
         maxLength: 25,
+        required: true
 
     },
     email: {
         type: String,
-        unique: true,
+        unique: true
     },
     password: {
         type: String,
@@ -20,6 +21,15 @@ const membersSchema = new mongoose.Schema({
     },
     photo: {
         type: String
+    },
+    age:{
+        type: Number,
+        min: 18,
+        max: 125
+    },
+    active_member:{
+        type: Boolean,
+        default: true,
     },
     phone: {
         type: Number
@@ -38,9 +48,11 @@ const membersSchema = new mongoose.Schema({
         }
     ]
 
-})
+});
 
-
+// index - ogranise data by ascending order
+membersSchema.index({age: 1});
+membersSchema.index({member_name: 1});
 
 
 

@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use('/api/members', membersRoutes);
 
-
+//main route
 app.get('/', (req, res)=>{
     res.send('The API is working!')
 })
