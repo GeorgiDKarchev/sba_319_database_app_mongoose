@@ -32,11 +32,16 @@ router.get('/:id', async (req, res) => {
 //---------------------------------------------------------------------
 
 /**
- * POST - create a new member
+ * POST - create a new member 
  */
 router.post('/', async (req, res) => {
+    console.log(req. body);
+    try{
     const member = await Member.create(req.body);
     res.status(201).json(member);
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 //----------------------------------------------------------------------
@@ -44,11 +49,19 @@ router.post('/', async (req, res) => {
 /**
  * PUT /:id
  * Update Members data 
+ * PATCH method also can be used (slightly different)
  */
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { body } = req;
+
+        //Stops request from updating the user's password
+        if (body.password) {
+            delete body.password;
+            console.log ('Password removed from body');
+        }
+
         const updatedMember = await Member.findByIdAndUpdate(id, body, { new: true });
         res.json(updatedMember);
     } catch (error) {
@@ -72,4 +85,75 @@ router.delete('/:id', async (req, res)=>{
     }
 });
 
-export default router;
+
+//--------------------------------------------------------------------------
+
+
+/**
+ * PUT /:id/update-password
+ * @param: client needs to send body: 
+ * {
+ *  currentPassword: "my old password"
+ *  newPassword: "my new password"
+ * }
+ * 
+ * We can use NodeMailer here to send emails before updating the password
+ */
+router.put('/:id/update-password', async (req, res) => {
+    try {
+      const {id} = req.params;
+      const {currentPassword, newPassword} = req.body;
+  
+      // find the member to update
+      const member = await Member.findById(id);
+      if (!member) return res.status(404).json({msg: "Member not found!"})
+  
+      // verify the old password with the password hash in db 
+      const passwordMatched = await bcrypt.compare(currentPassword, member.password);
+      if (!passwordMatched) {
+        return res.status(401).json({msg: "Authentication Error"})
+      }
+  
+      console.log('password matched!');
+  
+      // hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+      
+      // set the old password hash to the newPassword hash
+      await Member.findByIdAndUpdate(id, {password: hashedPassword});
+  
+      res.json({msg: 'Member password updated', member});
+      
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  
+  
+  /**
+   * POST /login
+   * @description authenticates an member with email and password
+   */
+  router.post('/login', async (req, res) => {
+    const {email, password} = req.body;
+  
+    // find member with the provided email
+    const member = await Member.findOne({email});
+  
+    if (!member) {
+      return res.status(401).json({msg: "Invalid Credentials"});
+    }
+  
+    // verify provided password with password hash from db
+    const passwordMatched = await bcrypt.compare(password, member.password);
+  
+    if (!passwordMatched) {
+      return res.status(401).json({msg: "Invalid Credentials password"})
+    }
+  
+    // TODO: generate a jwt token and send it to the client
+    res.json({msg: "member is logged in!", member});
+  
+  });
+  
+  export default router;

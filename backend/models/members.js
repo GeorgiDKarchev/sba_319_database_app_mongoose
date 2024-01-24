@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-
+//how strong the hashing of the password to be
+//8 and 9 for development
+//10 - 12 for production
 const SALT_ROUNDS = 8;
 
 const membersSchema = new mongoose.Schema({
@@ -69,7 +71,7 @@ membersSchema.index({member_name: 1});
 
 
 //------------------------Bcrypt- password hash----------------------------------
-      
+ //Middleware - hashing the password      
 membersSchema.pre('save', async function (next) {   //pre saved hook
     //if the password has not change continue  =>
     if (!this.isModified("password")) return next ();
